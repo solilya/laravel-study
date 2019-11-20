@@ -27,11 +27,17 @@ Route::get('form',function() { return view('form'); } );
 Route::post('process', 'TasksController@process');
 
 Route::get('home', 'TasksController@home');
-Route::get('object', 'object@index')->middleware('can:check_rights,"admin"');
-Route::get('object.php', 'object@index')->middleware('can:check_rights,"admin"');
-Route::post('object.php', 'object@index')->middleware('can:check_rights,"admin"');
+//Route::get('object', 'object@index')->middleware('can:check_rights,"admin"');
+//Route::get('object.php', 'object@index')->middleware('can:check_rights,"admin"');
+//Route::post('object.php', 'object@index')->middleware('can:check_rights,"admin"');
 
 
+Route::group(['middleware' => 'myauth:admin'], function () {
+    Route::get('object.php', 'object@index');
+	Route::post('object.php', 'object@index');
+    Route::get('object', 'object@index');
+	});
+	
 Route::get('tasks/create', 'TasksController@create');
 Route::post('tasks', 'TasksController@store');
 

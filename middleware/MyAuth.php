@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class MyAuth
 {
@@ -13,11 +14,14 @@ class MyAuth
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next,$rights)
     {
-
-    	$user->rights == $rights; 
-    	
-        return $next($request);
+    
+		$user=Auth::user();
+	   	if ((Auth::check())&&($user->rights == $rights))
+    	{
+			return $next($request);    	    	
+    	}
+    	else { return redirect('login'); }
     }
 }

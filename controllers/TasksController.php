@@ -31,6 +31,7 @@ class TasksController extends Controller
 		    'number.integer'  => 'Поле должно быть числом'
 		  ];
 
+		$request->session()->flash('status', 'Отправлен запрос!');
 
 		$validator = Validator::make($request->all(), $rules, $messages);
 		 
@@ -38,7 +39,8 @@ class TasksController extends Controller
 		{
 		        return redirect()->back()->withErrors($validator->errors());
 		}
-	
+		
+		\Session::flash('flash message', 'Форма отправлена!');
 #	$this->validate($request, [ 'name' => 'required|max:5','number' => 'integer|max:100203']);
 
 		return view('process')->with(['name'=>$name,'number'=>$number]);

@@ -1,2 +1,3 @@
 name: {{ $name }}<br>
-num: {{ $number }}
+num: {{ $number }} <BR>
+flash {{ session('status') }}

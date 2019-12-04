@@ -1,16 +1,18 @@
 <?php
 
+
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Validator;
 use DB;
-
+use App\Chop;
+use App\Object1;
 
 class object extends Controller
 {
 
-	public function index()
+	public function index(Request $request)
 	{		
 	
 ini_set('error_reporting', E_ALL);
@@ -31,9 +33,9 @@ $db->select_db("combat") or die("<p>Ошибка при выборе базы д
 
 
 
-	if ($action  =='print_menu') { $this->myAuth('admin'); $this->Print_menu($db);} 
+	if ($action  =='print_menu') { $this->Print_menu($db);} 
 	if ($action  =='add_form'){  $this->myAuth('admin'); return $this->Add_form($db); }	
-	if ($action  =='add'){ 	$this->myAuth('admin'); return $this->Add($db); }
+	if ($action  =='add'){ 	$this->myAuth('admin'); return $this->Add($db, $request); }
 	if ($action  =='del_object_form'){ $this->myAuth('admin'); return $this->Del_object_form($db); }	
 	if ($action  =='del_object'){ $this->myAuth('admin'); return $this->Del_object($db); }	
 	if ($action  =='login_form'){ return view('auth.login'); }
@@ -86,16 +88,27 @@ END
 
 function Add_form($db)
 {
-	$chopp = DB::select('select * from Chop');
-
+//	$chopp = DB::select('select * from Chop');
+	
+	$chopp= Chop::all();
     return view('add_object')->with(compact('chopp'));
 }
 
-function Add($db)
+function Add($db, Request $request)
 {
-	$input=$_POST;
 	
 	$id=random_int(1,2147483640);
+	while (Object1::find($id))
+	{ 
+		$id=random_int(1,2147483640);		
+	}
+	
+	 $fields=$request->only(['name','address','obj_id','pult_id','chop_id']);
+	 $fields['id']=$id;
+	 $obj = Object1::create($fields);
+	 if ($row=Object1::find($id))
+
+/*
 	$sth = $db->prepare("select id from Object where id=$id") or die ('Can not prepare sql query: "' .  mysqli_error($db).'"'); 	
  	if (!$sth->execute()) { die('Can not check id for Object!"' .  mysqli_error($db).'"');	}
  	$result=$sth->get_result();
@@ -119,30 +132,29 @@ function Add($db)
 	if (!$sth->execute()) { die("Error:".  mysqli_error($db)."!");	}	
 	$result=$sth->get_result();
 	if ($row=$result->fetch_assoc()) 
-	{      
-    		print <<<END
- <HTML>
+*/
+
+	{   
+		print <<<END
+<HTML>
 <HEAD>
 <TITLE>Управление Объектами</TITLE>
 </HEAD>
-
 <BODY BACKGROUND="" BGCOLOR="#C0c0c0" TEXT="#000000" LINK="#0000ff" VLINK="#800080" ALINK="#ff0000">
 <b>Добавлена информация:</b>
 <table border=0>
 <tr><td>Объект:</td>
 <td>{$row['name']}</td></tr>
 <tr><td>ЧОП:</td>
-<td>{$row['chop_name']}</td></tr>
+<td>{$row['chop']->name}</td></tr>
 <tr><td>Адрес:</td>
 <td>{$row['address']}</td></tr>
 <tr><td>Номер объекта:</td>
 <td>{$row['obj_id']}</td></tr>
 <tr><td>Пультовой номер:</td>
 <td>{$row['pult_id']}</td></tr>
-
 </table>
 <br>
-
 <A HREF="object.php?action=add_form">Добавить еще</A>&nbsp;&nbsp;&nbsp;&nbsp;
 <A HREF="object.php?action=print_menu">Управление объектами</A>
 </body>
@@ -150,6 +162,7 @@ function Add($db)
 END
 ; 	 			
 	}	
+
 }
 
 
@@ -157,7 +170,9 @@ function Del_object_form($db)
 {
 	$input=$_POST;
 	
-	$obj_list = DB::table('Object')->get();
+#	$obj_list = DB::table('Object')->get();
+#	$obj_list=Object1::all();
+	$obj_list=Object1::paginate(2);
 	return view('del_object_form')->with(compact('obj_list'));
 }
 
@@ -167,28 +182,8 @@ function Del_object($db)
 {
 	$input=$_POST;
 	if (isset($input['id']))
-	{
-		$idlist = join(',',$input['id']);	
-		$idlist = $db->real_escape_string($idlist);
-	
-	#	$sth = $db->prepare("select Trevoga.id as id, Trevoga.obj_id as obj_id, Object.name as name from Trevoga,Object where Trevoga.obj_id IN ($idlist) and Trevoga.obj_id=Object.id") or die ('Can not prepare sql query: "' .  mysqli_error($db).'"'); 	
-#		$result=$sth->get_result();
- 		
-#		while ($row=$result->fetch_assoc()) 
-#			write_log($db, "Удалена тревога после удаления объекта",$row['id'] ,$row['obj_id'],$user_id,'trevoga');  
-#		}
-
-#		$sth->execute();
-#	
-		foreach($input['id'] as $id)
-#		{	
-#			write_log($db, "Удален объект {$obj['name']}($id)",NULL,$id,$user_id,'object');  
-#		}
-		
-		$sth = $db->prepare("DELETE FROM Object where id IN ($idlist)");
-		$sth->execute();		
-	
-
+	{			
+		Object1::destroy($input['id']);	
 	}
 	return $this->Del_object_form($db);	
 }

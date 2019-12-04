@@ -17,10 +17,23 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-//        if (Auth::guard($guard)->check()) {
-//            return redirect()->intended('/home');
- //       }
+	
 
-        return $next($request);
+       if (Auth::guard($guard)->check()) {
+           return redirect()->intended('/newform'); //сюда отправится пользователь если обратится по адресу /login а пользователь залогинен
+       }
+       return $next($request);
+/*
+		if ($request->session()->has('url')) 
+    	{
+			$url = $request->session()->get('url');
+			$request->session()->forget('url');
+			return redirect()->away($url);
+		}
+       else  
+       { 
+       		return $next($request);
+       }
+*/
     }
 }

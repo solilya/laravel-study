@@ -15,6 +15,7 @@
 @endforeach		
 
 <tr><td colspan=3">
+{{ $obj_list->appends(['action' => 'del_object_form'])->links() }}
 <br>
 <br>
 <center><INPUT TYPE="submit" VALUE="Удалить">&nbsp;&nbsp;&nbsp;&nbsp;

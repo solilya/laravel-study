@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class MyAuth
+class MyAuth 
 {
     /**
      * Handle an incoming request.
@@ -17,11 +17,17 @@ class MyAuth
     public function handle($request, Closure $next,$rights)
     {
     
-		$user=Auth::user();
-	   	if ((Auth::check())&&($user->rights == $rights))
+
+	   	if ((Auth::check())&&(Auth::user()->rights == $rights))
     	{
 			return $next($request);    	    	
     	}
-    	else { return redirect('login'); }
+    	else 
+    	{ 
+
+			$request->session()->put('url', $request->fullUrl());
+	    	return redirect('login'); 
+   // 		return $next($request);    	    	
+    	}
     }
 }

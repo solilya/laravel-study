@@ -45,3 +45,7 @@ Route::post('tasks', 'TasksController@store');
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('volok','VolokController@index')->name('volok');
+Route::post('volok','VolokController@index')->name('volok');
+Route::get('volok/edit','VolokController@editform')->name('edit');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Support\Facades\Gate;
+use App\Events\TestEvent;
 
 class TasksController extends Controller
 {
@@ -42,6 +43,8 @@ class TasksController extends Controller
 		
 		\Session::flash('flash message', 'Форма отправлена!');
 #	$this->validate($request, [ 'name' => 'required|max:5','number' => 'integer|max:100203']);
+		
+		  event(new TestEvent("Запускаем событие")); // fire the event
 
 		return view('process')->with(['name'=>$name,'number'=>$number]);
 	}
